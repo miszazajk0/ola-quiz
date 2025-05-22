@@ -11,7 +11,7 @@
       background: radial-gradient(circle at center, #3c1361, #1b0033);
       color: #fff;
       padding: 20px;
-      background-image: url('assets/background.jpg'); /* <-- your new background */
+      background-image: url('assets/background.jpg');
       background-position: center center;
       background-repeat: no-repeat;
       background-size: cover;
@@ -76,35 +76,13 @@
 <body>
   <h1>Którą Olą jesteś?</h1>
 
-  <!-- Slide 0: Welcome -->
   <div class="slide active" id="slide-0">
     <p>Witamy w quizie! Kliknij, aby rozpocząć.</p>
     <button class="next">Rozpocznij quiz</button>
   </div>
 
-  <!-- Slide 1: Question 1 -->
-  <div class="slide" id="slide-1">
-    <p>Jak zaczynasz dzień?</p>
-    <div class="answers">
-      <label><input type="radio" name="q1" value="a"> Z kawą</label>
-      <label><input type="radio" name="q1" value="b"> Z herbatą</label>
-      <label><input type="radio" name="q1" value="c"> Z ćwiczeniami</label>
-    </div>
-    <button class="next">Dalej</button>
-  </div>
+  <!-- Slajdy z pytaniami będą tutaj generowane przez JS -->
 
-  <!-- Slide 2: Question 2 -->
-  <div class="slide" id="slide-2">
-    <p>Co najbardziej lubisz robić w weekend?</p>
-    <div class="answers">
-      <label><input type="radio" name="q2" value="a"> Spać</label>
-      <label><input type="radio" name="q2" value="b"> Spotykać się ze znajomymi</label>
-      <label><input type="radio" name="q2" value="c"> Oglądać seriale</label>
-    </div>
-    <button class="next">Zobacz wynik</button>
-  </div>
-
-  <!-- Result Slide -->
   <div id="result" class="result">
     <h2 id="resultTitle"></h2>
     <img id="resultImage" src="" alt="Wynik">
@@ -115,95 +93,261 @@
   <audio id="resultSound" src="assets/celebration.mp3" preload="auto"></audio>
 
 <script>
-const slides = document.querySelectorAll('.slide');
-const nextButtons = document.querySelectorAll('button.next');
+const questions = [
+  // Każde pytanie ma odpowiedzi z przypisaną kategorią rezultatu
+  {
+    text: "Od czego zaczynasz dzień?",
+    answers: [
+      { text: "Od kawusi ze spienionym mleczkiem", result: "sleepy" },
+      { text: "Od shake'a proteinowego", result: "sporty" },
+      { text: "Od mimozy na podwójnym proseczko", result: "drunk" },
+      { text: "Od śniadania w Maku", result: "hungry" }
+    ]
+  },
+  {
+    text: "W jakim mieście czujesz się najlepiej?",
+    answers: [
+      { text: "Wrocław, najlepiej jakaś sypialnia", result: "sleepy" },
+      { text: "Gdańsk, with ma gurrrrlz", result: "drunk" },
+      { text: "Poznań, na tourze po restauracjach", result: "hungry" },
+      { text: "Zakopane, wspinając się po górach", result: "sporty" }
+    ]
+  },
+  {
+    text: "Gdybyś była drinkiem to jaki byłby jego główny składnik?",
+    answers: [
+      { text: "Miodek+meliska", result: "sleepy" },
+      { text: "Wódeczka", result: "drunk" },
+      { text: "Winko", result: "hungry" },
+      { text: "Kreatyna", result: "sporty" }
+    ]
+  },
+  {
+    text: "Jak lubisz podróżować samochodem?",
+    answers: [
+      { text: "Na fotelu pasażera z niekontrolowanymi drzemkami", result: "sleepy" },
+      { text: "Na tylnej kanapie śpiewając hity z radia", result: "drunk" },
+      { text: "Jako kierowca, bo blisko do okiena w Drive-through", result: "hungry" },
+      { text: "Samochodem? Rower to jest świat!", result: "sporty" }
+    ]
+  },
+  {
+    text: "Najlepszy prezent na urodziny?",
+    answers: [
+      { text: "Kocyczek w misie", result: "sleepy" },
+      { text: "Butelka wina albo dwie", result: "drunk" },
+      { text: "Zapiekanka z ziemniaków i kiełbasy", result: "hungry" },
+      { text: "Drążek do podciągania", result: "sporty" }
+    ]
+  },
+  {
+    text: "Najlepsze wspomnienia z wakacji?",
+    answers: [
+      { text: "Drzemka na plaży", result: "sleepy" },
+      { text: "Szalone party z pina coladą w plastikowym kubku", result: "drunk" },
+      { text: "Obiady all-inclusive...", result: "hungry" },
+      { text: "Zrobione 30 tysięcy kroków podczas zwiedzania", result: "sporty" }
+    ]
+  },
+  {
+    text: "Ulubiona piosenka?",
+    answers: [
+      { text: "Aaa kotki dwa", result: "sleepy" },
+      { text: "Zapierdalam sobie w klapeczkach", result: "drunk" },
+      { text: "Hungry eyes", result: "hungry" },
+      { text: "Eye of the tiger", result: "sporty" }
+    ]
+  },
+  {
+    text: "Jak wygląda idealny sobotni wieczór?",
+    answers: [
+      { text: "Przebieram się w piżamę i kładę się wcześnie spać", result: "sleepy" },
+      { text: "Kiczowata domówka z kolorowymi drinkami", result: "drunk" },
+      { text: "Wieczorne zamawianie pizzy", result: "hungry" },
+      { text: "Trening bokserski lub jogging po mieście", result: "sporty" }
+    ]
+  },
+  {
+    text: "Twój największy guilty pleasure?",
+    answers: [
+      { text: "Drzemki w środku dnia", result: "sleepy" },
+      { text: "Drink do śniadania", result: "drunk" },
+      { text: "Podjadanie słodyczy nocą", result: "hungry" },
+      { text: "Scrollowanie fit-instagramów i planowanie następnych ćwiczeń", result: "sporty" }
+    ]
+  },
+  {
+    text: "Co sprawia, że masz ogromny uśmiech na twarzy?",
+    answers: [
+      { text: "Nowa poduszka do spania", result: "sleepy" },
+      { text: "Promocja na ulubiony alkohol", result: "drunk" },
+      { text: "Otwarta restauracja 24/7", result: "hungry" },
+      { text: "Personalny rekord na siłowni", result: "sporty" }
+    ]
+  }
+];
+
+// Map rezultatów na tytuł i obrazek
+const resultsData = {
+  sleepy: {
+    title: "Jesteś Olą Śpiącą!",
+    img: "assets/ola_sleepy.jpg",
+    desc: "Twój życiowy cel to drzemka na każdą okazję. Kanapa i kocyk to twoje najlepsze przyjaciółki, a najczęstsza aktywność sportowa to przewracanie się na drugi bok!"
+  },
+  drunk: {
+    title: "Jesteś Olą Pijaną!",
+    img: "assets/ola_drunk.jpg",
+    desc: "Ty to dopiero umiesz się bawić! Aperol, prosecco, domówki… Wino idzie u Ciebie w parze z każdą aktywnością."
+  },
+  hungry: {
+    title: "Jesteś Olą Głodną!",
+    img: "assets/ola_hungry.jpg",
+    desc: "Twoim najważniejszym planem w życiu jest... kolejny posiłek! Każda aktywność świetnie idzie, o ile trwa przy jedzeniu."
+  },
+  sporty: {
+    title: "Jesteś Olą Sportową!",
+    img: "assets/ola_sporty.jpg",
+    desc: "Nie usiedzisz w miejscu! Sport, trening, siłka — energia Cię rozpiera, a zdrowe życie to Twój żywioł."
+  }
+};
+
+const quizStartIndex = 1; // Slide 0 to welcome, quiz starts from 1
+let currentSlide = 0;
+let answerResults = [];
+
+function shuffleArray(array) {
+  // Simple Fisher–Yates shuffle
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function buildSlides() {
+  // Remove old slides if any except slide-0 (welcome)
+  document.querySelectorAll('.slide').forEach((el, idx) => { if(idx>0) el.remove(); });
+
+  // For each question, randomize order of answers and build slide
+  questions.forEach((q, i) => {
+    const slide = document.createElement('div');
+    slide.className = 'slide';
+    slide.id = 'slide-' + (i+1);
+
+    // Shuffle a copy of answers for this question
+    const answersShuffled = [...q.answers];
+    shuffleArray(answersShuffled);
+
+    slide.innerHTML = `
+      <p>${q.text}</p>
+      <div class="answers">
+        ${answersShuffled.map((ans, idx) =>
+          `<label>
+            <input type="radio" name="q${i+1}" value="${ans.result}"> ${ans.text}
+          </label>`
+        ).join('')}
+      </div>
+      <button class="next">${i === questions.length-1 ? "Zobacz wynik" : "Dalej"}</button>
+    `;
+    document.body.insertBefore(slide, document.getElementById('result'));
+  });
+}
+buildSlides();
+
+const slides = () => document.querySelectorAll('.slide');
 const resultDiv = document.getElementById('result');
 const resultTitle = document.getElementById('resultTitle');
 const resultImage = document.getElementById('resultImage');
 const resultSound = document.getElementById('resultSound');
-let currentSlide = 0;
 
-// Show only the current slide
+// Pokazuje tylko currentSlide
 function showSlide(n) {
-  slides.forEach((slide, i) => {
+  slides().forEach((slide, i) => {
     slide.classList.toggle('active', i === n);
   });
   resultDiv.style.display = "none";
 }
 
-function getResults() {
-  // Simple "scoring" for demonstration, you can adapt as needed
-  const q1 = document.querySelector('input[name="q1"]:checked');
-  const q2 = document.querySelector('input[name="q2"]:checked');
-  if (!q1 || !q2) {
-    return null;
+function countResults() {
+  // Zlicz wystąpienia każdego rezultatu
+  const tally = { sleepy: 0, drunk: 0, hungry: 0, sporty: 0 };
+  answerResults.forEach(r => { tally[r]++; });
+  let maxResult = 'sleepy'; // Default
+  let maxCount = tally.sleepy;
+  for(let key of Object.keys(tally)) {
+    if(tally[key] > maxCount) {
+      maxCount = tally[key];
+      maxResult = key;
+    }
   }
-  // Example logic: return fixed results for simplicity
-  if (q1.value === 'a' && q2.value === 'a') {
-    return {
-      title: "Jesteś Olą Śpioch!",
-      img: "assets/ola_sleepy.jpg"
-    };
-  } else if (q1.value === 'b' && q2.value === 'b') {
-    return {
-      title: "Jesteś Olą Towarzyską!",
-      img: "assets/ola_social.jpg"
-    };
-  } else {
-    return {
-      title: "Jesteś Olą Aktywną!",
-      img: "assets/ola_active.jpg"
-    };
-  }
+  return maxResult;
 }
 
 // Slide navigation
-nextButtons.forEach((btn, idx) => {
-  btn.addEventListener('click', function() {
-    // If last slide, show result
-    if (idx === slides.length - 1) {
-      // Validate all questions are answered
-      const allAnswered = Array.from(document.querySelectorAll('.answers')).every(ansDiv =>
-        ansDiv.querySelector('input[type="radio"]:checked')
-      );
-      if (!allAnswered) {
-        alert('Proszę odpowiedzieć na wszystkie pytania.');
-        return;
-      }
-      slides[currentSlide].classList.remove('active');
-      const result = getResults();
-      if (result) {
-        resultDiv.style.display = 'block';
-        resultTitle.textContent = result.title;
-        resultImage.src = result.img;
-        resultSound.play();
-      }
-    } else {
-      // Validate this question answered
-      const ansDiv = slides[currentSlide].querySelector('.answers');
-      if (ansDiv && !ansDiv.querySelector('input[type="radio"]:checked')) {
-        alert('Proszę wybrać odpowiedź.');
-        return;
-      }
-      slides[currentSlide].classList.remove('active');
-      currentSlide++;
-      showSlide(currentSlide);
+function setupSlideNavigation() {
+  answerResults = [];
+  currentSlide = 0;
+
+  showSlide(currentSlide);
+
+  slides().forEach((slide, idx) => {
+    const btn = slide.querySelector('.next');
+    if (btn) {
+      btn.onclick = function() {
+        // Last question: show results
+        if (idx === slides().length-1) {
+          // Collect answers
+          answerResults = [];
+          let allAnswered = true;
+          for(let qid=1; qid<=questions.length; qid++){
+            const chose = document.querySelector(input[name="q${qid}"]:checked);
+            if(!chose) {
+              allAnswered = false;
+              break;
+            }
+            answerResults.push(chose.value);
+          }
+          if(!allAnswered){
+            alert('Proszę odpowiedzieć na wszystkie pytania.');
+            return;
+          }
+          // Show result
+          slides()[currentSlide].classList.remove('active');
+          const res = countResults();
+          resultDiv.style.display = 'block';
+          resultTitle.textContent = resultsData[res].title;
+          resultImage.src = resultsData[res].img;
+          resultImage.alt = resultsData[res].title;
+          if (resultDiv.querySelector('p')) resultDiv.querySelector('p').remove();
+          const descEl = document.createElement('p');
+          descEl.textContent = resultsData[res].desc;
+          resultDiv.insertBefore(descEl, resultDiv.querySelector('img'));
+          resultSound.currentTime = 0;
+          resultSound.play();
+        } else {
+          // Validate current answer
+          const ansDiv = slide.querySelector('.answers');
+          if (ansDiv && !ansDiv.querySelector('input[type="radio"]:checked')) {
+            alert('Proszę wybrać odpowiedź.');
+            return;
+          }
+          slides()[currentSlide].classList.remove('active');
+          currentSlide++;
+          showSlide(currentSlide);
+        }
+      };
     }
   });
-});
+}
+setupSlideNavigation();
 
-// Restart quiz
 function restartQuiz() {
-  // Reset answers
   document.querySelectorAll('input[type="radio"]').forEach(inp => inp.checked = false);
-  currentSlide = 0;
-  showSlide(currentSlide);
+  answerResults = [];
+  buildSlides();
+  setupSlideNavigation();
+  showSlide(0);
   resultDiv.style.display = 'none';
 }
-
-// Start with first slide shown
-showSlide(0);
 </script>
-
 </body>
 </html>
