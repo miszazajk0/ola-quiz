@@ -11,16 +11,10 @@
       background: radial-gradient(circle at center, #3c1361, #1b0033);
       color: #fff;
       padding: 20px;
-      background-image: 
-        url('assets/balon.png'), 
-        url('assets/tort.png'), 
-        url('assets/grill.png'), 
-        url('assets/drink.png'), 
-        url('assets/piwo.png'), 
-        url('assets/usta.png');
-      background-position: 10% 10%, 90% 10%, 50% 20%, 20% 80%, 80% 80%, 50% 50%;
+      background-image: url('assets/background.jpg'); /* <-- your new background */
+      background-position: center center;
       background-repeat: no-repeat;
-      background-size: 60px;
+      background-size: cover;
     }
     h1 {
       color: #ff87d0;
@@ -34,6 +28,8 @@
       background: rgba(0, 0, 0, 0.4);
       padding: 20px;
       border-radius: 12px;
+      margin: 0 auto;
+      max-width: 400px;
     }
     .slide.active {
       display: block;
@@ -79,7 +75,36 @@
 </head>
 <body>
   <h1>Którą Olą jesteś?</h1>
-  <!-- The rest of the HTML content remains the same -->
+
+  <!-- Slide 0: Welcome -->
+  <div class="slide active" id="slide-0">
+    <p>Witamy w quizie! Kliknij, aby rozpocząć.</p>
+    <button class="next">Rozpocznij quiz</button>
+  </div>
+
+  <!-- Slide 1: Question 1 -->
+  <div class="slide" id="slide-1">
+    <p>Jak zaczynasz dzień?</p>
+    <div class="answers">
+      <label><input type="radio" name="q1" value="a"> Z kawą</label>
+      <label><input type="radio" name="q1" value="b"> Z herbatą</label>
+      <label><input type="radio" name="q1" value="c"> Z ćwiczeniami</label>
+    </div>
+    <button class="next">Dalej</button>
+  </div>
+
+  <!-- Slide 2: Question 2 -->
+  <div class="slide" id="slide-2">
+    <p>Co najbardziej lubisz robić w weekend?</p>
+    <div class="answers">
+      <label><input type="radio" name="q2" value="a"> Spać</label>
+      <label><input type="radio" name="q2" value="b"> Spotykać się ze znajomymi</label>
+      <label><input type="radio" name="q2" value="c"> Oglądać seriale</label>
+    </div>
+    <button class="next">Zobacz wynik</button>
+  </div>
+
+  <!-- Result Slide -->
   <div id="result" class="result">
     <h2 id="resultTitle"></h2>
     <img id="resultImage" src="" alt="Wynik">
@@ -89,8 +114,96 @@
 
   <audio id="resultSound" src="assets/celebration.mp3" preload="auto"></audio>
 
-  <script>
-    // JavaScript from the canvas, with "Najedzona Ola" logic removed
-  </script>
+<script>
+const slides = document.querySelectorAll('.slide');
+const nextButtons = document.querySelectorAll('button.next');
+const resultDiv = document.getElementById('result');
+const resultTitle = document.getElementById('resultTitle');
+const resultImage = document.getElementById('resultImage');
+const resultSound = document.getElementById('resultSound');
+let currentSlide = 0;
+
+// Show only the current slide
+function showSlide(n) {
+  slides.forEach((slide, i) => {
+    slide.classList.toggle('active', i === n);
+  });
+  resultDiv.style.display = "none";
+}
+
+function getResults() {
+  // Simple "scoring" for demonstration, you can adapt as needed
+  const q1 = document.querySelector('input[name="q1"]:checked');
+  const q2 = document.querySelector('input[name="q2"]:checked');
+  if (!q1 || !q2) {
+    return null;
+  }
+  // Example logic: return fixed results for simplicity
+  if (q1.value === 'a' && q2.value === 'a') {
+    return {
+      title: "Jesteś Olą Śpioch!",
+      img: "assets/ola_sleepy.jpg"
+    };
+  } else if (q1.value === 'b' && q2.value === 'b') {
+    return {
+      title: "Jesteś Olą Towarzyską!",
+      img: "assets/ola_social.jpg"
+    };
+  } else {
+    return {
+      title: "Jesteś Olą Aktywną!",
+      img: "assets/ola_active.jpg"
+    };
+  }
+}
+
+// Slide navigation
+nextButtons.forEach((btn, idx) => {
+  btn.addEventListener('click', function() {
+    // If last slide, show result
+    if (idx === slides.length - 1) {
+      // Validate all questions are answered
+      const allAnswered = Array.from(document.querySelectorAll('.answers')).every(ansDiv =>
+        ansDiv.querySelector('input[type="radio"]:checked')
+      );
+      if (!allAnswered) {
+        alert('Proszę odpowiedzieć na wszystkie pytania.');
+        return;
+      }
+      slides[currentSlide].classList.remove('active');
+      const result = getResults();
+      if (result) {
+        resultDiv.style.display = 'block';
+        resultTitle.textContent = result.title;
+        resultImage.src = result.img;
+        resultSound.play();
+      }
+    } else {
+      // Validate this question answered
+      const ansDiv = slides[currentSlide].querySelector('.answers');
+      if (ansDiv && !ansDiv.querySelector('input[type="radio"]:checked')) {
+        alert('Proszę wybrać odpowiedź.');
+        return;
+      }
+      slides[currentSlide].classList.remove('active');
+      currentSlide++;
+      showSlide(currentSlide);
+    }
+  });
+});
+
+// Restart quiz
+function restartQuiz() {
+  // Reset answers
+  document.querySelectorAll('input[type="radio"]').forEach(inp => inp.checked = false);
+  currentSlide = 0;
+  showSlide(currentSlide);
+  resultDiv.style.display = 'none';
+}
+
+// Start with first slide shown
+showSlide(0);
+</script>
+
 </body>
 </html>
